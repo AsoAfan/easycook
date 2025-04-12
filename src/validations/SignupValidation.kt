@@ -1,6 +1,6 @@
-package validations.validators
+package validations
 
-import validations.Validator
+import app.interfaces.Validator
 
 object SignupValidation : Validator {
 

@@ -1,8 +1,10 @@
-package views
+package views.categories
 
 import app.Routes
 import app.controllers.CategoryController
+import app.interfaces.Renderable
 import app.models.User
+import utills.UI
 
 class ShowCategoryView : Renderable {
 
@@ -10,9 +12,7 @@ class ShowCategoryView : Renderable {
     override fun render(props: Any?) {
         UI.pageHeader("category")
         val categories = CategoryController().index()
-//        println(categories)
 
-        var i = 1
         val ids = mutableListOf<String>()
         for (category in categories) {
             ids.add(category["id"].toString())
@@ -22,7 +22,6 @@ class ShowCategoryView : Renderable {
 
         val isAdmin = User.isAdmin()
         if (isAdmin) {
-            println("-2. sync categories")
             println("0. create new category")
         }
 
@@ -32,14 +31,9 @@ class ShowCategoryView : Renderable {
         } else if (isAdmin && option <= 0) {
             if (option == 0)
                 Routes.navigate("categories.create")
-            else if (option == -2) {
-                CategoryController().sync()
-            }
         } else {
             for (id in ids) {
-                println(id)
                 if (option.toString() == id) {
-                    println("hi $id")
                     Routes.navigate("category", id)
                 }
             }

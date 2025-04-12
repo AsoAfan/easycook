@@ -1,7 +1,9 @@
-package views
+package views.auth
 
 import app.controllers.UserController
+import app.interfaces.Renderable
 import app.middlewares.Guest
+import utills.UI
 
 class LoginView : Renderable {
 

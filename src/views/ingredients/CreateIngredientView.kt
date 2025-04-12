@@ -1,16 +1,18 @@
-package views
+package views.ingredients
 
 import app.Routes
-import app.controllers.CategoryController
+import app.controllers.IngredientsController
+import app.interfaces.Renderable
+import utills.UI
 import utills.errorln
 
-class CreateCategoryView : Renderable {
+class CreateIngredientView : Renderable {
 
     private lateinit var name: String
     private lateinit var image: String
 
     override fun render(props: Any?) {
-        UI.pageHeader("Create Category")
+        UI.pageHeader("Create Ingredient")
         showInputs()
         val option = UI.getUserOption()
         if (option == -1) {
@@ -22,8 +24,8 @@ class CreateCategoryView : Renderable {
     }
 
     private fun showInputs() {
-        name = UI.input("category name")
-        image = UI.input("category image")
+        name = UI.input("ingredient name")
+        image = UI.input("ingredient image")
         submit()
     }
 
@@ -32,7 +34,7 @@ class CreateCategoryView : Renderable {
             errorln("invalid inputs")
         }
 
-        CategoryController().store(
+        IngredientsController().store(
             mapOf("name" to name, "imageUrl" to image)
         )
     }

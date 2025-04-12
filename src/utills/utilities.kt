@@ -48,10 +48,14 @@ fun serializeToMap(str: String): Map<String, Any> {
     return map
 }
 
-fun serializeToList(str: String): List<Map<String, Any>> {
+fun serializeToList(str: String, isList: Boolean = true): MutableList<Map<String, Any>> {
+
+    if (str.length < 3) {
+        return mutableListOf()
+    }
 
     val list = mutableListOf<Map<String, Any>>()
-    val body = str.substring(1, str.length - 1)
+    val body = str.substring(1, str.length - if (isList) 2 else 1)
     val endOfClassNameIndex = body.indexOfFirst { c -> c == '(' }
     val data = body.split("), ")
     for (d in data) {
@@ -64,4 +68,9 @@ fun serializeToList(str: String): List<Map<String, Any>> {
 
 fun putToSession(key: String, value: Map<String, Any?>?) {
     DataSource.session[key] = value
+}
+
+fun removeFromSession(key: String) {
+
+    DataSource.session.remove(key)
 }

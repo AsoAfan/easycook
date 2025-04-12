@@ -1,5 +1,7 @@
 package app
 
+import utills.errorln
+import utills.serializeToMap
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -27,6 +29,9 @@ class Application(private val host: String = "localhost", private val port: Int 
             }
 
             val response = input.readLine()
+            if (response.contains("Unknown route")) {
+                errorln(serializeToMap(response)["error"] as String)
+            }
             return response
         }
     }

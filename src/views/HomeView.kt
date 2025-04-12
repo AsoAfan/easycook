@@ -4,7 +4,9 @@ import app.Application
 import app.DataSource
 import app.Routes
 import app.controllers.UserController
+import app.interfaces.Renderable
 import app.middlewares.Auth
+import utills.UI
 import utills.getDependency
 
 class HomeView : Renderable {

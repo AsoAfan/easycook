@@ -1,34 +1,38 @@
-package views
+package views.ingredients
 
 import app.Routes
-import app.controllers.CategoryController
+import app.controllers.IngredientsController
+import app.interfaces.Renderable
 import app.models.User
+import utills.UI
 
-class SingleCategory : Renderable {
+class SingleIngredientView : Renderable {
+
 
     private lateinit var name: String
     private lateinit var image: String
-    private var category: Map<String, Any>? = null;
-    override fun render(props: Any?) {
-        category = CategoryController().show(props!!)
 
-        println(category)
+    var ingredient: Map<String, Any>? = null
+
+    override fun render(props: Any?) {
+        ingredient = IngredientsController().show(props!!)
+
+        println(ingredient.toString())
 
         if (User.isAdmin()) {
-            println("0. Delete category")
-            println("1. update category")
+            println("0. Delete ingredient")
+            println("1. Update ingredient")
             val option = UI.getUserOption()
             if (option == 0) {
-                println("Are you sure you want to delete this category: ${category!!["name"]}")
+                println("Are you sure you want to delete this ingredient: ${ingredient?.get("name")}")
                 println("1. yes")
                 println("2. no")
                 val verify = UI.getUserOption()
                 if (verify == 1)
-                    CategoryController().delete(category!!["id"]!!)
+                    IngredientsController().delete(ingredient!!["id"].toString())
                 else Routes.navigateBack()
             } else if (option == 1) {
                 showInputs()
-
             }
         }
 
@@ -42,11 +46,10 @@ class SingleCategory : Renderable {
     }
 
     private fun submit() {
-        CategoryController().update(
-            category!!["id"].toString(),
+        IngredientsController().update(
+            ingredient!!["id"].toString(),
             mapOf("name" to name, "imageUrl" to image)
         )
     }
-
 
 }

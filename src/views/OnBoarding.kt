@@ -1,9 +1,10 @@
 package views
 
 import app.Routes
+import app.interfaces.Renderable
+import utills.UI.getUserOption
+import utills.UI.pageHeader
 import utills.errorln
-import views.UI.getUserOption
-import views.UI.pageHeader
 import kotlin.system.exitProcess
 
 class OnBoarding : Renderable {

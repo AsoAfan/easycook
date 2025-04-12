@@ -1,19 +1,22 @@
-package views
+package views.ingredients
 
 import app.DataSource
 import app.Routes
 import app.controllers.IngredientsController
+import app.interfaces.Renderable
+import utills.UI
 
-class ShowIngredientsView : Renderable {
+class ShowIngredientView : Renderable {
 
 
     override fun render(props: Any?) {
         UI.pageHeader("Ingredients")
         val ingredients = IngredientsController().index()
 
-        var i = 1
+        val ids = mutableListOf<String>()
         for (ingredient in ingredients) {
-            println("${i++}. $ingredient")
+            ids.add(ingredient["id"].toString())
+            println("${ingredient["id"]}. $ingredient")
 
         }
 
@@ -28,9 +31,10 @@ class ShowIngredientsView : Renderable {
         } else if (isAdmin && option == 0) {
             Routes.navigate("ingredients.create")
         } else {
-            for (n in 0..i) {
-                if (option == n)
-                    Routes.navigate("ingredient", n)
+            for (id in ids) {
+                if (option.toString() == id) {
+                    Routes.navigate("ingredient", id)
+                }
             }
         }
     }

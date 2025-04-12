@@ -1,7 +1,17 @@
 package app
 
-import validations.validators.SignupValidation
+import app.interfaces.Renderable
+import utills.UI
+import validations.SignupValidation
 import views.*
+import views.auth.LoginView
+import views.auth.SignupView
+import views.categories.CreateCategoryView
+import views.categories.ShowCategoryView
+import views.categories.SingleCategoryView
+import views.posts.CreatePostView
+import views.posts.ShowPostView
+import views.posts.SinglePost
 import java.util.*
 
 data class Route(val renderable: Renderable, val props: Any?)
@@ -30,7 +40,7 @@ object Routes {
         }
 
         route("category") {
-            SingleCategory()
+            SingleCategoryView()
         }
 
         route("categories.create") {
@@ -38,15 +48,15 @@ object Routes {
         }
 
         route("ingredients") {
-            ShowIngredientsView()
+            views.ingredients.ShowIngredientView()
         }
 
         route("ingredient") {
-            SingleIngredient()
+            views.ingredients.SingleIngredientView()
         }
 
         route("ingredients.create") {
-            CreateIngredientView()
+            views.ingredients.CreateIngredientView()
         }
 
         route("posts") {

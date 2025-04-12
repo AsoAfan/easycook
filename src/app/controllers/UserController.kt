@@ -2,10 +2,8 @@ package app.controllers
 
 import app.Application
 import app.Routes
-import utills.errorln
-import utills.getDependency
-import utills.putToSession
-import utills.serializeToMap
+import app.models.User
+import utills.*
 
 class UserController {
 
@@ -24,6 +22,7 @@ class UserController {
         putToSession(
             key = "user",
             value = mapOf(
+                "id" to data["id"],
                 "username" to data["username"],
                 "role" to data["role"]
             )
@@ -62,7 +61,8 @@ class UserController {
         println(data)
 
         if (data.containsKey("success")) {
-            putToSession("user", null)
+//            putToSession("user", null)
+            removeFromSession("user")
             println(data["success"])
             Routes.navigate("login")
         } else {
@@ -74,11 +74,10 @@ class UserController {
     fun info(): Map<String, Any> {
         val application = getDependency<Application>("app")
         val resp = application.sendRequest("GET", "/user")
-        return (serializeToMap(resp))
+        return serializeToMap(resp)
     }
 
     fun deleteAccount(user: Map<String, Any?>) {
-
         val application = getDependency<Application>("app")
         val resp = application.sendRequest(
             "POST", "/user",
@@ -86,6 +85,7 @@ class UserController {
         )
         val data = serializeToMap(resp)
         if (data.containsKey("success")) {
+            removeFromSession("user")
             println(data["success"])
             Routes.navigate("onBoarding")
         } else {
@@ -101,6 +101,16 @@ class UserController {
         val resp = application.sendRequest("POST", "/user/update", inputs)
         val data = serializeToMap(resp)
         if (data.containsKey("success")) {
+            putToSession(
+                "user",
+                User(
+                    id = data["id"].toString().toInt(),
+                    username = data["username"] as String,
+                    email = data["email"] as String,
+                    role = data["role"] as String,
+                    password = ""
+                ).toMap()
+            )
             println(data["success"])
         } else {
             errorln(data["error"].toString())

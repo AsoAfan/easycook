@@ -1,4 +1,4 @@
-package validations.validators
+package app.validators
 
 import app.ValidationInterface
 import utills.errorln

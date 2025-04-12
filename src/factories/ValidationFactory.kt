@@ -1,7 +1,7 @@
 package factories
 
 import app.ValidationInterface
-import validations.validators.ConfirmValidation
+import app.validators.ConfirmValidation
 
 
 object ValidationFactory {

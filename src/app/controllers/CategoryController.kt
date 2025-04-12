@@ -20,7 +20,8 @@ class CategoryController {
     fun show(id: Any): Map<String, Any> {
         val app = getDependency<Application>("app")
         val resp = app.sendRequest("POST", "/category", mapOf("id" to id))
-        val data = serializeToList(resp)
+        val data = serializeToList(resp, false)
+
         return data.first()
     }
 
@@ -45,7 +46,7 @@ class CategoryController {
         if (data.containsKey("error")) {
             errorln(data["error"] as String)
         } else {
-            println(resp)
+            println(data["success"] as String)
         }
         Routes.navigateBack()
 

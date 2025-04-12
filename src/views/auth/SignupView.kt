@@ -1,10 +1,13 @@
-package views
+package views.auth
 
 import app.ValidationHandler
 import app.controllers.UserController
+import app.interfaces.Renderable
+import app.interfaces.Validatable
+import app.interfaces.Validator
 import app.middlewares.Guest
+import utills.UI
 import utills.getDependency
-import validations.Validator
 
 class SignupView(private val validator: Validator) : Renderable, Validatable {
     private lateinit var username: String;

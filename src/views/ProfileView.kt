@@ -2,7 +2,9 @@ package views
 
 import app.Routes
 import app.controllers.UserController
+import app.interfaces.Renderable
 import app.middlewares.Auth
+import utills.UI
 
 class ProfileView : Renderable {
 

@@ -9,14 +9,22 @@ import utills.serializeToMap
 
 class IngredientsController {
 
-    fun index(): List<Any> {
+    fun index(): List<Map<String, Any>> {
 
         val app = getDependency<Application>("app")
         val resp = app.sendRequest("GET", "/ingredients")
+//        println(resp)
         val data = serializeToList(resp)
         return data
     }
 
+    fun show(id: Any): Map<String, Any> {
+        val app = getDependency<Application>("app")
+        val resp = app.sendRequest("POST", "/ingredient", mapOf("id" to id))
+        val data = serializeToList(resp, false)
+
+        return data.first()
+    }
 
     fun store(formInput: Map<String, Any>) {
         val app = getDependency<Application>("app")
@@ -33,14 +41,13 @@ class IngredientsController {
     }
 
     fun delete(id: String) {
-//        DataSource.ingredients.remove(ingredient)
         val app = getDependency<Application>("app")
         val resp = app.sendRequest("POST", "/ingredient/delete", mapOf("id" to id))
         val data = serializeToMap(resp)
         if (data.containsKey("error")) {
             errorln(data["error"] as String)
         } else {
-            println(resp)
+            println(data["success"])
         }
         Routes.navigateBack()
     }

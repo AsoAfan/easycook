@@ -6,11 +6,7 @@ import app.Routes
 import app.ValidationHandler
 
 fun main() {
-
-
     boostrap()
-
-
 }
 
 fun boostrap() {

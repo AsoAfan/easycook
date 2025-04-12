@@ -1,4 +1,4 @@
-package views
+package utills
 
 import app.Routes
 
@@ -22,13 +22,19 @@ object UI {
         separator(15, '_', false)
     }
 
-    fun <T> input(inputName: T): T {
+    fun <T> input(inputName: String, withReturnOption: Boolean = true): T {
         print("Enter your $inputName: ")
-        val input: T = readln() as T
-        if (input.toString() == "-1") {
-            Routes.navigateBack()
+        try {
+            val input = readln() as T
+            if (withReturnOption && input.toString() == "-1") {
+                Routes.navigateBack()
+            }
+
+            return input
+        } catch (e: Exception) {
+            errorln("Invalid input")
+            return input<T>(inputName)
         }
-        return input
     }
 
     fun getUserOption(): Int {
