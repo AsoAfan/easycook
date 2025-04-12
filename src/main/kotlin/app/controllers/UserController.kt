@@ -1,9 +1,9 @@
-package controllers
+package app.controllers
 
-import models.DataSource
-import models.User
-import serializeToMap
-import setSessionUser
+import app.core.DataSource
+import app.core.serializeToMap
+import app.core.setSessionUser
+import app.models.User
 
 class UserController {
 
@@ -11,8 +11,7 @@ class UserController {
 
         val data = serializeToMap(formInput as String)
 
-        val duplicatedUser = DataSource.users.find { user -> user.username == data["username"] }
-
+        val duplicatedUser = User.findByUsername(data["username"] as String)
         if (duplicatedUser != null) {
             return mapOf(
                 "error" to "${duplicatedUser.username} already exists.",
@@ -26,14 +25,17 @@ class UserController {
             role = data["role"] as String,
         )
 
+        if (!user.save()) {
+            return mapOf("error" to "An error occurred ").toString()
+        }
+
         DataSource.users.add(user)
-
-
         setSessionUser(user)
 
         return mapOf(
             "message" to "User ${user.username} created successfully.",
             "id" to user.id,
+            "email" to user.email,
             "username" to user.username,
             "role" to user.role,
         ).toString()
@@ -41,12 +43,12 @@ class UserController {
 
     fun login(formInput: Any): String {
         val data = serializeToMap(formInput as String)
-        val user = DataSource.users.find {
-            it.username == data["username"] && it.password == data["password"]
-        }
-        if (user == null) {
+        val user =
+            User.findByUsername(data["username"] as String) ?: return mapOf("error" to "invalid credentials").toString()
+        if (user.password != data["password"] as String) {
             return mapOf("error" to "invalid credentials").toString()
         }
+
 
         setSessionUser(user)
 
@@ -71,7 +73,7 @@ class UserController {
     }
 
     fun info(s: String): String {
-        return DataSource.session["user"].toString()
+        return User.findByUsername(DataSource.session["user"]?.get("username") as String)?.toMap().toString()
     }
 
 
@@ -79,14 +81,14 @@ class UserController {
 
         val data = serializeToMap(body as String)
 
-        val user = DataSource.users.find { user -> user.id.toString() == data["id"] }
-        if (user != null) {
+        val user = User.findById(data["id"]?.toInt() ?: 0)
+        if (user != null && user.delete()) {
             DataSource.users.remove(user)
             DataSource.session.remove("user")
-            DataSource.syncUsersToFile()
             return mapOf(
                 "success" to "${user.username} deleted successfully",
             ).toString()
+
         }
 
         return mapOf("error" to "user not found").toString()
@@ -98,28 +100,29 @@ class UserController {
 
         val data = serializeToMap(formInput as String)
 
-        val duplicatedUser = DataSource.users.find { user -> user.username == data["username"] }
+        val duplicatedUser = User.findByUsername(data["username"] as String)
 
         if (duplicatedUser != null) {
             return mapOf(
                 "error" to "${duplicatedUser.username} already exists.",
             ).toString()
         }
-        val user = DataSource.users.find { user -> user.id == DataSource.session["user"]?.get("id") }
-        if (user == null) {
-            return mapOf("error" to "user not found").toString()
-        }
+        val user = User.findById(DataSource.session["user"]?.get("id") as Int)
+            ?: return mapOf("error" to "user not found").toString()
+
         user.let {
             it.username = data["username"] as String
             it.email = data["email"] as String
             it.password = data["password"] as String
             it.role = data["role"] as String
         }
+
+        user.update()
         setSessionUser(user)
-        DataSource.syncUsersToFile()
         return mapOf(
             "success" to "updated successfully",
             "id" to user.id,
+            "email" to user.email,
             "username" to user.username,
             "role" to user.role,
         ).toString()

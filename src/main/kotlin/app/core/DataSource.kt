@@ -1,10 +1,13 @@
-package models
+package app.core
 
+import app.models.Category
+import app.models.Ingredient
+import app.models.Post
+import app.models.User
 import java.io.File
 
 object DataSource {
 
-    val clientHandlers = mutableListOf<ClientController>()
     val users: MutableList<User> = mutableListOf()
     val session: MutableMap<String, Map<String, Any?>?> = mutableMapOf()
 
@@ -25,7 +28,7 @@ object DataSource {
 
 
     fun syncCategoriesToFile() {
-        val fileName = "${CSV_FOLDER}/categories.csv"
+        val fileName = "$CSV_FOLDER/categories.csv"
         val file = File(fileName)
         if (file.exists()) {
             file.delete()
@@ -37,7 +40,7 @@ object DataSource {
             out.newLine()
 
             categories.forEach { category ->
-                val row = "${category.name},${category.imagUrl},${category.id}"
+                val row = "${category.name},${category.imageUrl},${category.id}"
                 out.write(row)
                 out.newLine()
             }
@@ -46,7 +49,7 @@ object DataSource {
     }
 
     fun syncIngredientsToFile() {
-        val fileName = "${CSV_FOLDER}/ingredients.csv"
+        val fileName = "$CSV_FOLDER/ingredients.csv"
         val file = File(fileName)
         if (file.exists()) {
             file.delete()
@@ -58,7 +61,7 @@ object DataSource {
             out.newLine()
 
             ingredients.forEach { ingredient ->
-                val row = "${ingredient.name},${ingredient.imagUrl},${ingredient.id}"
+                val row = "${ingredient.name},${ingredient.imageUrl},${ingredient.id}"
                 out.write(row)
                 out.newLine()
             }
@@ -67,7 +70,7 @@ object DataSource {
     }
 
     fun syncUsersToFile() {
-        val fileName = "${CSV_FOLDER}/users.csv"
+        val fileName = "$CSV_FOLDER/users.csv"
         val file = File(fileName)
         file.delete()
         file.createNewFile()
@@ -93,7 +96,7 @@ object DataSource {
     }
 
     private fun loadCategories() {
-        val fileName = "${CSV_FOLDER}/categories.csv"
+        val fileName = "$CSV_FOLDER/categories.csv"
         val file = File(fileName)
         if (!file.exists()) {
             return
@@ -104,7 +107,7 @@ object DataSource {
                 val parts = line.split(",")
                 Category(
                     name = parts[0],
-                    imagUrl = parts[1],
+                    imageUrl = parts[1],
                     id = parts[2].toInt(),
                 )
             }.toList()
@@ -114,7 +117,7 @@ object DataSource {
     }
 
     private fun loadIngredients() {
-        val fileName = "${CSV_FOLDER}/ingredients.csv"
+        val fileName = "$CSV_FOLDER/ingredients.csv"
         val file = File(fileName)
         if (!file.exists()) {
             return
@@ -125,7 +128,7 @@ object DataSource {
                 val parts = line.split(",")
                 Ingredient(
                     name = parts[0],
-                    imagUrl = parts[1],
+                    imageUrl = parts[1],
                     id = parts[2].toInt(),
                 )
             }.toList()
@@ -135,7 +138,7 @@ object DataSource {
     }
 
     private fun loadUsers() {
-        val fileName = "${CSV_FOLDER}/users.csv"
+        val fileName = "$CSV_FOLDER/users.csv"
         val file = File(fileName)
         if (!file.exists()) {
             return

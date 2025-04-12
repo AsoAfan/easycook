@@ -1,35 +1,29 @@
-package controllers
+package app.controllers
 
-import models.DataSource
-import models.Ingredient
-import serializeToMap
+import app.core.DataSource
+import app.core.serializeToMap
+import app.models.Ingredient
 
 class IngredientController {
     fun index(body: String): String {
-        val ingredients = DataSource.ingredients
+        val ingredients = Ingredient.findAll()
 
         return ingredients.toString()
     }
 
-    fun sync(body: Any): String {
-        DataSource.syncCategoriesToFile()
-        return "sync success"
-    }
-
     fun show(body: String): String {
-        val ingredient = DataSource.ingredients.find { it.id.toString() == body }
-        if (ingredient == null) {
-            return mapOf(
+        val data = serializeToMap(body)
+        val ingredient = Ingredient.findById(data["id"].toString().toInt())
+            ?: return mapOf(
                 "error" to "ingredient not found"
             ).toString()
-        }
 
         return ingredient.toString()
     }
 
     fun store(body: String): String {
         val data = serializeToMap(body)
-        val duplicatedIngredient = DataSource.ingredients.find { ingredient -> ingredient.name == data["name"] }
+        val duplicatedIngredient = Ingredient.findByName(data["name"] as String)
 
         if (duplicatedIngredient != null) {
             return mapOf(
@@ -37,27 +31,27 @@ class IngredientController {
             ).toString()
         }
 
-        val element = Ingredient(
+        val ingredient = Ingredient(
             name = data["name"] ?: "",
-            imagUrl = data["imageUrl"] ?: "",
+            imageUrl = data["imageUrl"] ?: "",
         )
-        DataSource.ingredients.add(element)
+        if (!ingredient.save()) {
+            return mapOf("error" to "save ingredient failed").toString()
+        }
+        DataSource.ingredients.add(ingredient)
         return mapOf(
-            "success" to "${element.name} created successfully"
+            "success" to "${ingredient.name} created successfully"
         ).toString()
     }
 
     fun update(body: String): String {
         val data = serializeToMap(body)
-        val ingredient = DataSource.ingredients.find { it.id.toString() == data["id"] }
-
-        if (ingredient == null) {
-            return mapOf(
+        val ingredient = Ingredient.findById(data["id"].toString().toInt())
+            ?: return mapOf(
                 "error" to "ingredient not found"
             ).toString()
-        }
 
-        val duplicatedIngredient = DataSource.ingredients.find { ind -> ind.name == data["name"] }
+        val duplicatedIngredient = Ingredient.findByName(data["name"] as String)
 
         if (duplicatedIngredient != null) {
             return mapOf(
@@ -70,7 +64,11 @@ class IngredientController {
 
         ingredient.let {
             it.name = data["name"] as String
-            it.imagUrl = data["imageUrl"] as String
+            it.imageUrl = data["imageUrl"] as String
+        }
+
+        if (!ingredient.update()) {
+            return mapOf("error" to "update ingredient failed").toString()
         }
 
         return mapOf(
@@ -81,18 +79,23 @@ class IngredientController {
 
     fun delete(body: String): String {
         val data = serializeToMap(body)
-        val ingredient = DataSource.ingredients.find { it.id.toString() == data["id"] }
-        if (ingredient == null) {
-            return mapOf(
+        val ingredient = Ingredient.findById(data["id"].toString().toInt())
+            ?: return mapOf(
                 "error" to "ingredient not found"
             ).toString()
+
+        if (!ingredient.delete()) {
+            return mapOf("error" to "delete ingredient failed").toString()
         }
         DataSource.ingredients.remove(ingredient)
-        DataSource.syncCategoriesToFile()
         return mapOf(
             "success" to "${ingredient.name} deleted successfully"
         ).toString()
     }
 
+    fun sync(body: Any): String {
+        DataSource.syncCategoriesToFile()
+        return "sync success"
+    }
 
 }

@@ -1,14 +1,14 @@
-package controllers
+package app.controllers
 
-import models.Category
-import models.DataSource
-import serializeToMap
+import app.core.DataSource
+import app.core.serializeToMap
+import app.models.Category
 
 class CategoryController {
 
     fun index(body: Any): String {
 
-        val categories = DataSource.categories
+        val categories = Category.findAll()
 
         return categories.toString()
     }
@@ -20,27 +20,25 @@ class CategoryController {
 
     fun show(body: String): String {
         val data = serializeToMap(body)
-        val category = DataSource.categories.find { it.id.toString() == data["id"] }
-        if (category == null) {
-            return mapOf(
+        val category = Category.findById(data["id"].toString().toInt())
+            ?: return mapOf(
                 "error" to "category not found"
             ).toString()
-        }
 
         return category.toString()
-//        return body
     }
 
     fun delete(body: String): String {
         val data = serializeToMap(body)
-        val category = DataSource.categories.find { it.id.toString() == data["id"] }
-        if (category == null) {
-            return mapOf(
+        val category = Category.findById(data["id"].toString().toInt())
+            ?: return mapOf(
                 "error" to "category not found"
             ).toString()
+
+        if (!category.delete()) {
+            return mapOf("error" to "category delete failed").toString()
         }
         DataSource.categories.remove(category)
-        DataSource.syncCategoriesToFile()
         return mapOf(
             "success" to "${category.name} deleted successfully"
         ).toString()
@@ -48,7 +46,7 @@ class CategoryController {
 
     fun store(body: String): String {
         val data = serializeToMap(body)
-        val duplicatedCategory = DataSource.categories.find { category -> category.name == data["name"] }
+        val duplicatedCategory = Category.findByName(data["name"] as String)
 
         if (duplicatedCategory != null) {
             return mapOf(
@@ -58,8 +56,13 @@ class CategoryController {
 
         val category = Category(
             name = data["name"] ?: "",
-            imagUrl = data["imageUrl"] ?: "",
+            imageUrl = data["imageUrl"] ?: "",
         )
+        if (!category.save()) {
+            return mapOf(
+                "error" to "category save failed"
+            ).toString()
+        }
         DataSource.categories.add(category)
         return mapOf(
             "success" to "${category.name} created successfully"
@@ -68,15 +71,13 @@ class CategoryController {
 
     fun update(formInput: String): String {
         val data = serializeToMap(formInput)
-        val category = DataSource.categories.find { it.id.toString() == data["id"] }
-
-        if (category == null) {
-            return mapOf(
+        val category = Category.findById(data["id"].toString().toInt())
+            ?: return mapOf(
                 "error" to "category not found"
             ).toString()
-        }
 
-        val duplicatedCategory = DataSource.categories.find { cat -> cat.name == data["name"] }
+
+        val duplicatedCategory = Category.findByName(data["name"] as String)
 
         if (duplicatedCategory != null) {
             return mapOf(
@@ -89,22 +90,14 @@ class CategoryController {
 
         category.let {
             it.name = data["name"] as String
-            it.imagUrl = data["imageUrl"] as String
+            it.imageUrl = data["imageUrl"] as String
         }
+
+        category.update()
 
         return mapOf(
             "success" to "$name updated"
         ).toString()
     }
 
-
-    /*
-        fun update(category: Category?, inputs: Map<String, String>) {
-            category?.let {
-                it.name = inputs["name"] as String
-                it.imagUrl = inputs["image"] as String
-            }
-
-            Routes.navigateBack()
-        }*/
 }

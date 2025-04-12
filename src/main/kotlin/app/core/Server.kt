@@ -1,7 +1,8 @@
-import controllers.CategoryController
-import controllers.IngredientController
-import controllers.UserController
-import models.DataSource
+package app.core
+
+import app.controllers.CategoryController
+import app.controllers.IngredientController
+import app.controllers.UserController
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -9,13 +10,11 @@ import java.net.ServerSocket
 import java.net.Socket
 
 class Server(private val port: Int) {
-    //    private val controller = MyController()
     private val routes = mutableMapOf<String, (String) -> String>()
 
     init {
         DataSource.loadFile()
         initializeRoutes()
-
     }
 
     private fun initializeRoutes() {
@@ -48,7 +47,7 @@ class Server(private val port: Int) {
         routes["POST /ingredient/create"] = ingredientController::store
         routes["POST /ingredient/update"] = ingredientController::update
         routes["POST /ingredient/delete"] = ingredientController::delete
-        routes["GET /ingredient"] = ingredientController::show
+        routes["POST /ingredient"] = ingredientController::show
         routes["POST /ingredients/sync"] = ingredientController::sync
 
     }
@@ -56,9 +55,11 @@ class Server(private val port: Int) {
     fun start() {
         ServerSocket(port).use { serverSocket ->
             println("Server started on port $port")
+            Logger.info("hdjdji")
+            Database.getConnection()
             while (true) {
                 val clientSocket = serverSocket.accept()
-                println("Client connected: ${clientSocket.inetAddress.hostAddress}")
+                println("Client connected: ${clientSocket.inetAddress.hostName}")
                 Thread { handleClient(clientSocket) }.start()
             }
         }
@@ -95,9 +96,4 @@ class Server(private val port: Int) {
             }
         }
     }
-}
-
-fun main() {
-    val server = Server(5000)
-    server.start()
 }
